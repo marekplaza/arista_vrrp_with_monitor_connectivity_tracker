@@ -1,4 +1,4 @@
-! Startup-config last modified at Fri Dec 12 11:50:58 2025 by root
+! Startup-config last modified at Fri Dec 12 13:16:02 2025 by root
 ! device: ISP2 (cEOSLab, EOS-4.33.5M-43713794.4335M (engineering build))
 !
 no aaa root
@@ -63,7 +63,6 @@ interface Loopback84
    ip address 8.8.4.4/32
 !
 interface Loopback88
-   shutdown
    ip address 8.8.8.8/32
 !
 interface Management0

@@ -1,4 +1,4 @@
-! Startup-config last modified at Fri Dec 12 11:50:58 2025 by root
+! Startup-config last modified at Fri Dec 12 13:16:02 2025 by root
 ! device: VRRP2 (cEOSLab, EOS-4.33.5M-43713794.4335M (engineering build))
 !
 no aaa root
@@ -54,7 +54,7 @@ interface Ethernet4
    description to_LAN
    no switchport
    ip address 192.168.0.2/24
-   vrrp 1 priority-level 50
+   vrrp 1 priority-level 150
    vrrp 1 ipv4 192.168.0.250
    vrrp 1 ipv4 version 3
 !
@@ -114,10 +114,14 @@ route-map OUTBOND_TO_ISP1 permit 10
 !
 router bgp 65000
    router-id 22.22.22.22
+   neighbor IBGP peer group
+   neighbor IBGP remote-as 65000
+   neighbor IBGP next-hop-self
    neighbor ISP2 peer group
    neighbor ISP2 remote-as 2222
    neighbor ISP2 route-map OUTBOND_TO_ISP2 out
    neighbor 20.20.20.1 peer group ISP2
+   neighbor 192.168.0.1 peer group IBGP
    network 192.168.0.0/24
 !
 router multicast

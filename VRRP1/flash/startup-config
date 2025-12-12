@@ -1,4 +1,4 @@
-! Startup-config last modified at Fri Dec 12 11:50:57 2025 by root
+! Startup-config last modified at Fri Dec 12 13:16:02 2025 by root
 ! device: VRRP1 (cEOSLab, EOS-4.33.5M-43713794.4335M (engineering build))
 !
 no aaa root
@@ -52,6 +52,7 @@ interface Ethernet4
    description to_LAN
    no switchport
    ip address 192.168.0.1/24
+   vrrp 1 priority-level 250
    vrrp 1 ipv4 192.168.0.250
    vrrp 1 ipv4 version 3
 !
@@ -82,11 +83,17 @@ monitor connectivity
       local-interfaces int_to_ISP1 address-only
       ip 8.8.8.8
 !
-event-handler DNS_google
-   action bash Cli -p15 -c $'enable\n configure\n interface Ethernet 4\vrrp 1 priority-level 50\n end'
+event-handler DNS_google_DOWN
+   action bash Cli -p15 -c $'enable\n configure\n interface Ethernet 4\n vrrp 1 priority-level 50\n end'
    !
    trigger on-logging
-      regex DNS.*8.8.8.8* is unreachable .*Ethernet4
+      regex DNS.*8.8.8.8* is unreachable .*Ethernet1
+!
+event-handler DNS_google_UP
+   action bash Cli -p15 -c $'enable\n configure\n interface Ethernet 4\n vrrp 1 priority-level 250\n end'
+   !
+   trigger on-logging
+      regex DNS.*8.8.8.8* is reachable .*Ethernet1
 !
 event-handler VRRP
 !
@@ -104,10 +111,14 @@ route-map OUTBOND_TO_ISP1 permit 10
 !
 router bgp 65000
    router-id 11.11.11.11
+   neighbor IBGP peer group
+   neighbor IBGP remote-as 65000
+   neighbor IBGP next-hop-self
    neighbor ISP1 peer group
    neighbor ISP1 remote-as 1111
    neighbor ISP1 route-map OUTBOND_TO_ISP1 out
    neighbor 10.10.10.1 peer group ISP1
+   neighbor 192.168.0.2 peer group IBGP
    network 192.168.0.0/24
 !
 router multicast
