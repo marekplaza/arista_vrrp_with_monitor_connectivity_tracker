@@ -133,9 +133,11 @@ VRRP1# sh ip bgp
 ## 4️⃣ Automatyczne przełączenie VRRP 🔄
 
 ```bash
-Dec 12 12:49:17 ConnectivityMonitor: Host DNS (8.8.8.8) is unreachable
-Dec 12 12:49:37 EventMgr: Event handler DNS_google_UP activated
-Dec 12 12:49:40 VRRP: Ethernet4 Grp 1 state Backup -> Master
+Dec 12 12:56:45 VRRP1 ConnectivityMonitor: %CONNECTIVITYMON-5-HOST_UNREACHABLE: Host DNS (8.8.8.8) is unreachable with ICMP probes from interface Ethernet1
+Dec 12 12:57:05 VRRP1 EventMgr: %SYS-6-EVENT_TRIGGERED: Event handler DNS_google_DOWN was activated
+Dec 12 12:57:06 VRRP1 ConfigAgent: %SYS-5-CONFIG_E: Enter configuration mode from console by root on UnknownTty (UnknownIpAddr)
+Dec 12 12:57:06 VRRP1 ConfigAgent: %SYS-5-CONFIG_I: Configured from console by root on UnknownTty (UnknownIpAddr)
+Dec 12 12:57:08 VRRP1 Fhrp: %VRRP-5-STATECHANGE: Ethernet4 Grp 1 state Master -> Backup
 ```
 
 📉 VRRP spada z 250 → 50:
