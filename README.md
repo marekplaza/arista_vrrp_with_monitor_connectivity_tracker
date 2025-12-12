@@ -91,6 +91,7 @@ event-handler DNS_google_UP
 
 ```bash
 VRRP1#sh monitor connectivity 
+(...)
 IP Address Local Interface  Latency  Jitter Packet Loss Probe Error
 8.8.8.8    Ethernet1        0.229 ms 0.02 ms          0% n/a
 ```
@@ -125,7 +126,17 @@ VRRP1# sh ip bgp
 ### 📉 Connectivity Monitor:
 
 ```bash
-8.8.8.8  Ethernet1   n/a  n/a  100%  Network is unreachable
+VRRP1#sh mon connectivity
+
+VRF: default
+Host: DNS
+Payload size: 56
+ICMP ping count: 5
+Description: "ping do DNS google 8.8.8.8"
+Network statistics:
+IP Address Local Interface Latency Jitter Packet Loss Probe Error           
+---------- --------------- ------- ------ ----------- ----------------------
+8.8.8.8    Ethernet1           n/a    n/a        100% Network is unreachable
 ```
 
 ---
