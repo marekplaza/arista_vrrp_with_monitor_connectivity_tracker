@@ -2,7 +2,7 @@
 ## Automatyczne przełączanie priorytetu VRRP na podstawie osiągalności DNS Google (8.8.8.8)
 
 📌 **Schemat labu:**  
-![diagram](vrrp_plus_mc_tracker.excalidraw.png)
+![diagram](diagram.excalidraw.png)
 
 ---
 
