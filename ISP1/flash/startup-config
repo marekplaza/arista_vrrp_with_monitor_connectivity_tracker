@@ -1,0 +1,104 @@
+! Startup-config last modified at Fri Dec 12 11:50:58 2025 by root
+! device: ISP1 (cEOSLab, EOS-4.33.5M-43713794.4335M (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$7VY2btHMoawUMMmh$cKgqJfBY.3T8lQn8bP3kykwGho49k8TlqNOlZYwA4NkKde2s7O3XIq4DkA/feV5AFGlOg9AWsY/4bqOl9e2ce.
+username cvpadmin privilege 15 role network-admin secret sha512 $6$IbGDH.ih1UYgL0KG$Q39IiqmNZskv5DnDVxYFlVntDZ17ZSArrCMT7Ig5uTu57AylV/5Et/jqRlSz49KxqnrEiCrnv0BhSClO05SEK.
+!
+management api http-commands
+   protocol http
+   protocol unix-socket
+   no shutdown
+   !
+   vrf mgmt
+      no shutdown
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname ISP1
+ip name-server vrf mgmt 10.138.165.2
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vrf instance mgmt
+!
+management api gnmi
+   transport grpc default
+      vrf mgmt
+!
+management api netconf
+   transport ssh default
+      vrf mgmt
+!
+interface Ethernet1
+   description to_VRRP1
+   no switchport
+   ip address 10.10.10.1/30
+!
+interface Ethernet2
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Loopback1
+   ip address 1.1.1.1/32
+!
+interface Loopback84
+   ip address 8.8.4.4/32
+!
+interface Loopback88
+   ip address 8.8.8.8/32
+!
+interface Management0
+   vrf mgmt
+   ip address 192.168.111.1/24
+   no lldp transmit
+   no lldp receive
+!
+ip routing
+ip routing vrf mgmt
+!
+ip prefix-list DNS seq 10 permit 8.8.8.8/32
+ip prefix-list DNS seq 20 permit 8.8.4.4/32
+!
+ip route vrf mgmt 0.0.0.0/0 192.168.111.250
+!
+ntp server vrf mgmt tempus1.gum.gov.pl iburst
+!
+route-map OUTBOND permit 10
+   match ip address prefix-list DNS
+!
+router bgp 1111
+   router-id 1.1.1.1
+   neighbor VRRP peer group
+   neighbor VRRP remote-as 65000
+   neighbor VRRP route-map OUTBOND out
+   neighbor 10.10.10.2 peer group VRRP
+   redistribute connected
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end

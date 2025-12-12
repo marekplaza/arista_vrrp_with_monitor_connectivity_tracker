@@ -1,0 +1,130 @@
+! Startup-config last modified at Fri Dec 12 11:50:58 2025 by root
+! device: VRRP2 (cEOSLab, EOS-4.33.5M-43713794.4335M (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$IoZLrGrMONMaBK2m$YIi1cZ//NS7dQweV4XnaB4hnSJV118bHeZjWYBEUuyEd.i0lMNX8xtZK/lKQyG1SpUMLZA/XaXOPUpWyhh.8x1
+username cvpadmin privilege 15 role network-admin secret sha512 $6$uX9lvN6Z.CiM8Ne4$B0bHDO1emYer3ksAzH/w.i8Ix0llEt53OFuphEGeoRxSLLTp1oAjUWx/IdDQihsin0RKsvgjfwScdHTHj4cHk.
+!
+management api http-commands
+   protocol http
+   protocol unix-socket
+   no shutdown
+   !
+   vrf mgmt
+      no shutdown
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname VRRP2
+ip name-server vrf mgmt 10.138.165.2
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vrf instance mgmt
+!
+management api gnmi
+   transport grpc default
+      vrf mgmt
+!
+management api netconf
+   transport ssh default
+      vrf mgmt
+!
+interface Ethernet1
+!
+interface Ethernet2
+   description to_ISP2
+   no switchport
+   ip address 20.20.20.2/30
+!
+interface Ethernet3
+   description to_VRRP1
+   no switchport
+!
+interface Ethernet4
+   description to_LAN
+   no switchport
+   ip address 192.168.0.2/24
+   vrrp 1 priority-level 50
+   vrrp 1 ipv4 192.168.0.250
+   vrrp 1 ipv4 version 3
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Ethernet12/1
+   shutdown
+!
+interface Loopback0
+   ip address 22.22.22.22/32
+!
+interface Management0
+   vrf mgmt
+   ip address 192.168.111.5/24
+   no lldp transmit
+   no lldp receive
+!
+monitor connectivity
+   interval 5
+   no shutdown
+   interface set int_to_ISP2 Ethernet2
+   !
+   host DNS
+      description "ping do DNS google 8.8.8.8"
+      local-interfaces int_to_ISP2 address-only
+      ip 8.8.8.8
+!
+event-handler DNS_google_DOWN
+   action bash Cli -p15 -c $'enable\n configure\n interface Ethernet 4\n vrrp 1 priority-level 50\n end'
+   !
+   trigger on-logging
+      regex DNS.*8.8.8.8* is unreachable .*Ethernet2
+!
+event-handler DNS_google_UP
+   action bash Cli -p15 -c $'enable\n configure\n interface Ethernet 4\n vrrp 1 priority-level 150\n end'
+   !
+   trigger on-logging
+      regex DNS.*8.8.8.8* is reachable .*Ethernet2
+!
+ip routing
+ip routing vrf mgmt
+!
+ip prefix-list LAN_TO_ISP seq 10 permit 192.168.0.0/24
+!
+ip route vrf mgmt 0.0.0.0/0 192.168.111.250
+!
+ntp server vrf mgmt tempus1.gum.gov.pl iburst
+!
+route-map OUTBOND_TO_ISP1 permit 10
+   match ip address prefix-list LAN_TO_ISP
+!
+router bgp 65000
+   router-id 22.22.22.22
+   neighbor ISP2 peer group
+   neighbor ISP2 remote-as 2222
+   neighbor ISP2 route-map OUTBOND_TO_ISP2 out
+   neighbor 20.20.20.1 peer group ISP2
+   network 192.168.0.0/24
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end

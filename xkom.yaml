@@ -1,0 +1,43 @@
+name: XKOM
+prefix: ""
+mgmt:
+  network: XKOM
+  ipv4-subnet: 192.168.111.0/24
+  ipv4-gw: 192.168.111.250
+  external-access: true
+topology:
+  kinds:
+    ceos:
+      image: arista/ceos:4.33.5M
+      startup-config: single.cfg
+  nodes:
+    VRRP1:
+      kind: ceos
+    VRRP2:
+      kind: ceos
+    ISP1:
+      kind: ceos
+    ISP2:
+      kind: ceos
+    LAN:
+      kind: ceos
+  links:
+  - endpoints:
+    - VRRP1:eth3
+    - VRRP2:eth3
+  - endpoints:
+    - VRRP1:eth4
+    - LAN:eth1
+  - endpoints:
+    - VRRP2:eth4
+    - LAN:eth2
+  - endpoints:
+    - VRRP1:eth1
+    - ISP1:eth1
+  - endpoints:
+    - VRRP2:eth2
+    - ISP2:eth2
+  - endpoints:
+    - ISP1:eth2
+    - ISP2:eth1
+
